@@ -101,10 +101,14 @@
 <p>可能的会话范围意味着 RTP 端系统应该被编写成对底层传输基本上是不可知的。将传输地址和端口的知识仅限于您的低级网络代码，并使用 RTP 级机制进行参与者识别是一个很好的设计。 RTP 为此目的提供了一个“synchronization source”。</p>
 <p>注意：</p>
 <blockquote>
+<blockquote>
 <p>1.您不应使用传输地址作为参与者标识符，因为数据可能已通过可能隐藏原始源地址的转换器或混合器。而是使用同步源标识符。</p>
 </blockquote>
+</blockquote>
+<blockquote>
 <blockquote>
 <p>2.您不应假设一个会话只有两个参与者，即使它使用的是单播。单播连接的另一端可能是一个 RTP 转换器或混合器，充当潜在无限数量的其他参与者的网关。</p>
+</blockquote>
 </blockquote>
 <p>一个好的设计使参与者几乎看不到实际的交流方式。</p>
 <h1 id="二、RTP-Data-Transfer-Packet（RTP数据传输包）"><a href="#二、RTP-Data-Transfer-Packet（RTP数据传输包）" class="headerlink" title="二、RTP Data Transfer Packet（RTP数据传输包）"></a>二、RTP Data Transfer Packet（RTP数据传输包）</h1><p>RTP数据包分为四个部分：</p>
@@ -176,7 +180,7 @@ a=rtpmap:98 H263-1998/90000 </code></pre>
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2021/06/13/rtp2/" data-id="ckpvb49r000059gu63v3987b6" data-title="rtp学习笔记（二） RTP数据传输协议" class="article-share-link">分享</a>
+      <a data-url="http://example.com/2021/06/13/rtp2/" data-id="ckpvb5qd90005z0u67po375ng" data-title="rtp学习笔记（二） RTP数据传输协议" class="article-share-link">分享</a>
       
       
       
@@ -265,7 +269,7 @@ a=rtpmap:98 H263-1998/90000 </code></pre>
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2021/06/12/rtp1/" data-id="ckpvb49qo00009gu6gpgwc6as" data-title="rtp学习笔记（一） RTP传输协议介绍" class="article-share-link">分享</a>
+      <a data-url="http://example.com/2021/06/12/rtp1/" data-id="ckpvb5qcx0000z0u6hu2yd1jh" data-title="rtp学习笔记（一） RTP传输协议介绍" class="article-share-link">分享</a>
       
       
       
