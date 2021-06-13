@@ -130,7 +130,7 @@
 |                           |  Padding   |
 ------------------------------------------</code></pre>
 <h2 id="2-1-Header-Elements（头元素）"><a href="#2-1-Header-Elements（头元素）" class="headerlink" title="2.1 Header Elements（头元素）"></a>2.1 Header Elements（头元素）</h2><p>强制性的 RTP 数据包头的长度通常为 12 个八位字节，尽管它可能包含一个贡献源列表，它可以将长度扩展 4 到 60 个额外的八位字节。强制报头中的字段是有效载荷类型、序列号、时间戳和同步源标识符。此外，还有贡献源的计数、感兴趣事件的标记、对填充和标头扩展的支持以及版本号。</p>
-<h3 id="2-1-1-PALOAD-TYPE（负载类型）"><a href="#2-1-1-PALOAD-TYPE（负载类型）" class="headerlink" title="2.1.1 PALOAD TYPE（负载类型）"></a>2.1.1 PALOAD TYPE（负载类型）</h3><p>RTP 报头的 payload type 或 PT 字段标识了由 RTP 数据包传输的媒体。接收应用程序检查负载类型以确定如何处理数据——例如，将其传递给特定的解压缩器。有效载荷字段的确切解释由 RTP 配置文件定义，它将有效载荷类型编号绑定到有效载荷格式规范，或由非 RTP 方式定义。</p>
+<h3 id="2-1-1-PAYLOAD-TYPE（负载类型）"><a href="#2-1-1-PAYLOAD-TYPE（负载类型）" class="headerlink" title="2.1.1 PAYLOAD TYPE（负载类型）"></a>2.1.1 PAYLOAD TYPE（负载类型）</h3><p>RTP 报头的 payload type 或 PT 字段标识了由 RTP 数据包传输的媒体。接收应用程序检查负载类型以确定如何处理数据——例如，将其传递给特定的解压缩器。有效载荷字段的确切解释由 RTP 配置文件定义，它将有效载荷类型编号绑定到有效载荷格式规范，或由非 RTP 方式定义。</p>
 <p>许多应用程序在 RTP 配置文件下运行，用于具有最小控制的音频和视频会议 (RFC 1890)。此配置文件（通常称为 audio/video配置文件）定义了负载类型编号和负载格式规范之间的默认映射表。 Table 4.1 中显示了这些静态分配的示例（这不是完整列表；配置文件定义了其他分配）。除了静态分配之外，带外信令（例如，使用 SIP、RTSP、SAP 或 H.323）可用于定义映射。当使用音频/视频配置文件时，96 到 127 范围内的有效负载类型以这种方式保留用于动态分配；其他配置文件可能会指定不同的范围。</p>
 <p>负载格式根据 MIME 命名空间命名。这个命名空间最初是为电子邮件定义的，用于识别附件的内容，但它已经成为媒体格式的通用命名空间，并在许多应用程序中使用。将 MIME 类型与 RTP 一起使用是相对较新的——有效载荷类型名称最初占据一个单独的命名空间——但它是一个强大的功能，为每种类型的媒体提供传输和编码选项的中央存储库。</p>
 <p>所有负载格式现在都应该有一个 MIME 类型注册。较新的有效载荷格式将其包含在其规范中。</p>
@@ -163,7 +163,7 @@ a=rtpmap:98 H263-1998/90000 </code></pre>
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2021/06/13/rtp2/" data-id="ckpvbcruw000198u6e3mx8lju" data-title="rtp学习笔记（二） RTP数据传输协议" class="article-share-link">分享</a>
+      <a data-url="http://example.com/2021/06/13/rtp2/" data-id="ckpvbe4lp0005gku6c5cf4q6b" data-title="rtp学习笔记（二） RTP数据传输协议" class="article-share-link">分享</a>
       
       
       
@@ -252,7 +252,7 @@ a=rtpmap:98 H263-1998/90000 </code></pre>
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2021/06/12/rtp1/" data-id="ckpvbcrur000098u6erzg898e" data-title="rtp学习笔记（一） RTP传输协议介绍" class="article-share-link">分享</a>
+      <a data-url="http://example.com/2021/06/12/rtp1/" data-id="ckpvbe4le0000gku698ol9cku" data-title="rtp学习笔记（一） RTP传输协议介绍" class="article-share-link">分享</a>
       
       
       
