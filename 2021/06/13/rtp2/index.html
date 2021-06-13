@@ -6,15 +6,15 @@
   
   <title>rtp学习笔记（二） RTP数据传输协议 | Rionnag&#39;s blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="（来自《RTP：Audio and video for the Internet》第四章） RTP数据传输协议包含：1.RTP会话、2.RTP数据传输包、3.包验证、4.Translators and Mixers 一、RTP Sessions（RTP会话）二、RTP Data Transfer Packet（RTP数据传输包）2.1 Header Elements（头元素）2.1.1 PALOA">
+  <meta name="description" content="（来自《RTP：Audio and video for the Internet》第四章） RTP数据传输协议包含：1.RTP会话、2.RTP数据传输包、3.包验证、4.Translators and Mixers 一、RTP Sessions（RTP会话）会话由使用 RTP 进行通信的一组参与者组成。一个参与者可能在多个 RTP 会话中处于活动状态——例如，一个会话用于交换音频数据，另一个会话用">
 <meta property="og:type" content="article">
 <meta property="og:title" content="rtp学习笔记（二） RTP数据传输协议">
 <meta property="og:url" content="http://example.com/2021/06/13/rtp2/index.html">
 <meta property="og:site_name" content="Rionnag&#39;s blog">
-<meta property="og:description" content="（来自《RTP：Audio and video for the Internet》第四章） RTP数据传输协议包含：1.RTP会话、2.RTP数据传输包、3.包验证、4.Translators and Mixers 一、RTP Sessions（RTP会话）二、RTP Data Transfer Packet（RTP数据传输包）2.1 Header Elements（头元素）2.1.1 PALOA">
+<meta property="og:description" content="（来自《RTP：Audio and video for the Internet》第四章） RTP数据传输协议包含：1.RTP会话、2.RTP数据传输包、3.包验证、4.Translators and Mixers 一、RTP Sessions（RTP会话）会话由使用 RTP 进行通信的一组参与者组成。一个参与者可能在多个 RTP 会话中处于活动状态——例如，一个会话用于交换音频数据，另一个会话用">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-06-13T09:38:38.000Z">
-<meta property="article:modified_time" content="2021-06-13T10:32:40.472Z">
+<meta property="article:modified_time" content="2021-06-13T14:46:39.799Z">
 <meta property="article:author" content="rionnag">
 <meta property="article:tag" content="rtp">
 <meta property="article:tag" content="音视频">
@@ -99,11 +99,73 @@
       
         <p>（来自《RTP：Audio and video for the Internet》第四章）</p>
 <p>RTP数据传输协议包含：1.RTP会话、2.RTP数据传输包、3.包验证、4.Translators and Mixers</p>
-<h1 id="一、RTP-Sessions（RTP会话）"><a href="#一、RTP-Sessions（RTP会话）" class="headerlink" title="一、RTP Sessions（RTP会话）"></a>一、RTP Sessions（RTP会话）</h1><h1 id="二、RTP-Data-Transfer-Packet（RTP数据传输包）"><a href="#二、RTP-Data-Transfer-Packet（RTP数据传输包）" class="headerlink" title="二、RTP Data Transfer Packet（RTP数据传输包）"></a>二、RTP Data Transfer Packet（RTP数据传输包）</h1><h2 id="2-1-Header-Elements（头元素）"><a href="#2-1-Header-Elements（头元素）" class="headerlink" title="2.1 Header Elements（头元素）"></a>2.1 Header Elements（头元素）</h2><h3 id="2-1-1-PALOAD-TYPE（负载类型）"><a href="#2-1-1-PALOAD-TYPE（负载类型）" class="headerlink" title="2.1.1 PALOAD TYPE（负载类型）"></a>2.1.1 PALOAD TYPE（负载类型）</h3><h3 id="2-1-2-SEQUENCE-NUMBER（序列号）"><a href="#2-1-2-SEQUENCE-NUMBER（序列号）" class="headerlink" title="2.1.2 SEQUENCE NUMBER（序列号）"></a>2.1.2 SEQUENCE NUMBER（序列号）</h3><h3 id="2-1-3-TIMESTAMP（时间戳）"><a href="#2-1-3-TIMESTAMP（时间戳）" class="headerlink" title="2.1.3 TIMESTAMP（时间戳）"></a>2.1.3 TIMESTAMP（时间戳）</h3><h3 id="2-1-4-SSRC-SYNCHRONIZATION-SOURCE-（同步源）"><a href="#2-1-4-SSRC-SYNCHRONIZATION-SOURCE-（同步源）" class="headerlink" title="2.1.4 SSRC(SYNCHRONIZATION SOURCE)（同步源）"></a>2.1.4 SSRC(SYNCHRONIZATION SOURCE)（同步源）</h3><h3 id="2-1-5-CSRCs-CONTRIBUTING-SOURCE-（贡献源）"><a href="#2-1-5-CSRCs-CONTRIBUTING-SOURCE-（贡献源）" class="headerlink" title="2.1.5 CSRCs(CONTRIBUTING SOURCE)（贡献源）"></a>2.1.5 CSRCs(CONTRIBUTING SOURCE)（贡献源）</h3><h3 id="2-1-6-MARKER"><a href="#2-1-6-MARKER" class="headerlink" title="2.1.6 MARKER"></a>2.1.6 MARKER</h3><h3 id="2-1-7-PADDING"><a href="#2-1-7-PADDING" class="headerlink" title="2.1.7 PADDING"></a>2.1.7 PADDING</h3><h3 id="2-1-8-VERSION-NUMBER"><a href="#2-1-8-VERSION-NUMBER" class="headerlink" title="2.1.8 VERSION NUMBER"></a>2.1.8 VERSION NUMBER</h3><h2 id="2-2-Payload-Headers（负载头）"><a href="#2-2-Payload-Headers（负载头）" class="headerlink" title="2.2 Payload Headers（负载头）"></a>2.2 Payload Headers（负载头）</h2><h2 id="2-3-Payload-Data（负载数据）"><a href="#2-3-Payload-Data（负载数据）" class="headerlink" title="2.3 Payload Data（负载数据）"></a>2.3 Payload Data（负载数据）</h2><h1 id="三、Packet-Validation（包验证）"><a href="#三、Packet-Validation（包验证）" class="headerlink" title="三、Packet Validation（包验证）"></a>三、Packet Validation（包验证）</h1><h1 id="四、Translators-and-Mixers"><a href="#四、Translators-and-Mixers" class="headerlink" title="四、Translators and Mixers"></a>四、Translators and Mixers</h1>
+<h1 id="一、RTP-Sessions（RTP会话）"><a href="#一、RTP-Sessions（RTP会话）" class="headerlink" title="一、RTP Sessions（RTP会话）"></a>一、RTP Sessions（RTP会话）</h1><p>会话由使用 RTP 进行通信的一组参与者组成。一个参与者可能在多个 RTP 会话中处于活动状态——例如，一个会话用于交换音频数据，另一个会话用于交换视频数据。对于每个参与者，会话由数据应发送到的网络地址和端口对以及接收数据的端口对标识。发送端口和接收端口可能相同。每个端口对包括两个相邻的端口：一个用于 RTP 数据包的偶数端口，以及用于 RTCP 控制包的下一个更高（奇数）端口。 UDP/IP 的默认端口对是 5004 和 5005，但许多应用程序在会话设置期间动态分配端口并忽略默认值。 RTP 会话旨在传输单一类型的媒体；在多媒体通信中，每种媒体类型都应承载在单独的 RTP 会话中。</p>
+<p>（RTP 规范的最新版本放宽了 RTP 数据端口为偶数的要求，并允许不相邻的 RTP 和 RTCP 端口。此更改使在存在某些类型的网络地址转换 (NAT) 设备的环境中使用 RTP 成为可能。如果可能，为了与旧实现兼容，使用相邻端口是明智的，即使这不是严格要求的。）</p>
+<p>会话可以是单播的，可以是直接在两个参与者之间（点对点会话）或重新分配数据的中央服务器。或者它可以多播给一组参与者。会话也不必限于单个传输地址空间。例如，RTP 转换器可用于桥接单播和多播之间或 IP 和其他传输（如 IPv6 或 ATM）之间的会话。本章稍后将在标题为 Translators 和 Mixers 的部分中更详细地讨论转换器。</p>
+<p>可能的会话范围意味着 RTP 端系统应该被编写成对底层传输基本上是不可知的。将传输地址和端口的知识仅限于您的低级网络代码，并使用 RTP 级机制进行参与者识别是一个很好的设计。 RTP 为此目的提供了一个“synchronization source”。</p>
+<p>注意：</p>
+<pre><code>1.您不应使用传输地址作为参与者标识符，因为数据可能已通过可能隐藏原始源地址的转换器或混合器。而是使用同步源标识符。
+
+2.您不应假设一个会话只有两个参与者，即使它使用的是单播。单播连接的另一端可能是一个 RTP 转换器或混合器，充当潜在无限数量的其他参与者的网关。</code></pre>
+<p>一个好的设计使参与者几乎看不到实际的交流方式。</p>
+<h1 id="二、RTP-Data-Transfer-Packet（RTP数据传输包）"><a href="#二、RTP-Data-Transfer-Packet（RTP数据传输包）" class="headerlink" title="二、RTP Data Transfer Packet（RTP数据传输包）"></a>二、RTP Data Transfer Packet（RTP数据传输包）</h1><p>RTP数据包分为四个部分：</p>
+<p>1.强制的RTP数据头</p>
+<p>2.可选的数据头扩展</p>
+<p>3.可选的负载头（取决于所使用的负载格式）</p>
+<p>4.负载数据本身</p>
+<p>整个 RTP 数据包包含在较低层的有效载荷中，通常是 UDP/IP。</p>
+<pre><code>------------------------------------------
+|v |P|X|CC  |M|PT     |Sequence number   |
+|----------------------------------------|
+|                Timestamp               |
+|----------------------------------------|
+|Synchronization source (SSRC) identifier|
+|----------------------------------------|
+|Contributing sources(CSRC) identifiers  |
+|----------------------------------------| 
+|          Header extension (optional)   |
+|----------------------------------------|
+|Payload header(payload format dependent)|
+|----------------------------------------|
+|                                        |
+|              Payload data              |
+|                           -------------|
+|                           |  Padding   |
+------------------------------------------</code></pre>
+<h2 id="2-1-Header-Elements（头元素）"><a href="#2-1-Header-Elements（头元素）" class="headerlink" title="2.1 Header Elements（头元素）"></a>2.1 Header Elements（头元素）</h2><p>强制性的 RTP 数据包头的长度通常为 12 个八位字节，尽管它可能包含一个贡献源列表，它可以将长度扩展 4 到 60 个额外的八位字节。强制报头中的字段是有效载荷类型、序列号、时间戳和同步源标识符。此外，还有贡献源的计数、感兴趣事件的标记、对填充和标头扩展的支持以及版本号。</p>
+<h3 id="2-1-1-PALOAD-TYPE（负载类型）"><a href="#2-1-1-PALOAD-TYPE（负载类型）" class="headerlink" title="2.1.1 PALOAD TYPE（负载类型）"></a>2.1.1 PALOAD TYPE（负载类型）</h3><p>RTP 报头的 payload type 或 PT 字段标识了由 RTP 数据包传输的媒体。接收应用程序检查负载类型以确定如何处理数据——例如，将其传递给特定的解压缩器。有效载荷字段的确切解释由 RTP 配置文件定义，它将有效载荷类型编号绑定到有效载荷格式规范，或由非 RTP 方式定义。</p>
+<p>许多应用程序在 RTP 配置文件下运行，用于具有最小控制的音频和视频会议 (RFC 1890)。此配置文件（通常称为 audio/video配置文件）定义了负载类型编号和负载格式规范之间的默认映射表。 Table 4.1 中显示了这些静态分配的示例（这不是完整列表；配置文件定义了其他分配）。除了静态分配之外，带外信令（例如，使用 SIP、RTSP、SAP 或 H.323）可用于定义映射。当使用音频/视频配置文件时，96 到 127 范围内的有效负载类型以这种方式保留用于动态分配；其他配置文件可能会指定不同的范围。</p>
+<p>负载格式根据 MIME 命名空间命名。这个命名空间最初是为电子邮件定义的，用于识别附件的内容，但它已经成为媒体格式的通用命名空间，并在许多应用程序中使用。将 MIME 类型与 RTP 一起使用是相对较新的——有效载荷类型名称最初占据一个单独的命名空间——但它是一个强大的功能，为每种类型的媒体提供传输和编码选项的中央存储库。</p>
+<p>所有负载格式现在都应该有一个 MIME 类型注册。较新的有效载荷格式将其包含在其规范中。</p>
+<p>无论负载类型分配是静态的还是动态的，都需要向应用程序描述会话，以便应用程序知道要使用哪些负载类型。描述会话的常用方法是会话描述协议 (SDP)。一个会话描述可能如下所示：</p>
+<pre><code>v=0
+o=bloggs 2890844526 2890842807 IN IP4 10.45.1.82 
+s=-
+e=j.bloggs@example.com(Joe Bloggs)
+c=IN IP4 224.2.17.12/127
+t=2873397496 2873404696 
+m=audio 49170 RTP/AVP 0
+m=video 51372 RTP/AVP 98
+a=rtpmap:98 H263-1998/90000 </code></pre>
+<p>我们对 RTP 的讨论感兴趣的是 c= 和 m= 行，它们为 RTP 会话通信地址和端口并定义使用的配置文件和有效载荷类型，以及 a=rtpmap: 行，它生成动态有效载荷类型分配。</p>
+<p>该示例描述了两个 RTP 会话：音频被发送到端口 49170 上的 IPv4 多播组 224.2.17.12，生存时间为 127，视频被发送到端口 51372 上的同一个多播组。音频和视频都使用 RTP /AVP 作为他们的交通工具；这是使用 RTP 配置文件进行音频和视频会议的最小控制 RTP 传输。</p>
+<p>用于音频的有效载荷类型为 0。这是配置文件中的静态分配，即 AUDIO/PCMU 的有效载荷格式。视频的载荷类型为 98，由 a=rtpmap: 行映射到 VIDEO/H263-1998 的载荷格式。通过参考 MIME 类型分配表，我们发现 VIDEO/H263-1998 的定义在 RFC 2429 中。</p>
+<p>尽管 SDP 是描述 RTP 会话的常用解决方案，但 RTP 中没有任何内容需要使用 SDP。例如，基于 ITU 建议的 H.323 的应用程序使用 RTP 进行媒体传输，但使用不同的机制 (H.245) 来描述会话。</p>
+<pre><code>关于载荷类型编号到净荷格式的静态分配与动态分配的优点存在一些争论，这可能受到音频/视频配置文件中一长串静态分配和动态分配所需信令的感知复杂性的鼓励。
+当 RTP 是新的并且它的使用是简单有效载荷格式的实验主题时，静态有效载荷类型分配是有意义的。接收器可以仅根据有效载荷类型编号对 RTP 有效载荷进行解码，因为编解码器不需要额外的配置，并且没有信令简化了这些新应用程序的开发。
+然而，随着设计人员获得 RTP 的经验并将其应用于更复杂的有效载荷格式，很明显进行静态分配的做法是有缺陷的。
+今天使用的大多数有效载荷格式除了有效载荷类型分配之外还需要一些配置，需要使用信令；和新兴应用程序（例如 IP 语音和视频点播）需要用于用户位置、身份验证和支付的信令。因为无论如何都需要信令，静态有效载荷类型分配的动机就失去了。
+要求动态分配还避免了由于有效载荷类型空间耗尽而导致的问题；只有 127 种可能的静态分配，并且可能的有效载荷格式的数量远远超过这些。动态分配只允许将会话期间所需的那些格式绑定到有效负载类型编号。
+因此，IETF 音频/视频传输工作组的政策是不再进行静态分配，并且应用程序应在带外发出其有效载荷类型使用情况的信号。</code></pre>
+<p>RTP 媒体时钟，以及任何有效载荷标头的格式和有效载荷本身。</p>
+<p>对于静态分配，时钟速率在配置文件中指定；动态分配必须指示时钟速率同负载类型和负载格式之间的映射。例如，在前面的会话描述中，a=rtpmap: 行为 VIDEO/H263-1998 有效载荷格式指定了 90,000-Hz 时钟。大多数有效载荷格式以一组有限的时钟速率运行，有效载荷格式规范定义了哪些速率是有效的。</p>
+<p>RTP 会话不需要只使用单一的有效载荷格式；会话中可以使用多种有效载荷格式，不同的格式由不同的有效载荷类型标识。格式可以在会话内随时改变，只要预先传达了有效载荷类型到有效载荷格式的映射，在改变发生之前不需要信令。一个例子可能是在 IP 语音会话中对 DTMF 音进行编码，以支持“按 0 与操作员通话”风格的自动化服务，其中一种格式用于语音，另一种格式用于音调。</p>
+<p>尽管可以在一个会话中使用多种有效载荷格式，但有效载荷类型并不打算用于多路复用不同类别的媒体。例如，如果应用程序同时发送音频和视频，则它们应该作为两个不同的 RTP 会话在不同的地址/端口上发送，而不是作为单个 RTP 会话发送并按有效载荷类型进行多路分解。这种媒体分离允许应用程序为不同的媒体请求不同的网络服务质量，这也是 RTP 控制协议正确运行所必需的。</p>
+<h3 id="2-1-2-SEQUENCE-NUMBER（序列号）"><a href="#2-1-2-SEQUENCE-NUMBER（序列号）" class="headerlink" title="2.1.2 SEQUENCE NUMBER（序列号）"></a>2.1.2 SEQUENCE NUMBER（序列号）</h3><h3 id="2-1-3-TIMESTAMP（时间戳）"><a href="#2-1-3-TIMESTAMP（时间戳）" class="headerlink" title="2.1.3 TIMESTAMP（时间戳）"></a>2.1.3 TIMESTAMP（时间戳）</h3><h3 id="2-1-4-SSRC-SYNCHRONIZATION-SOURCE-（同步源）"><a href="#2-1-4-SSRC-SYNCHRONIZATION-SOURCE-（同步源）" class="headerlink" title="2.1.4 SSRC(SYNCHRONIZATION SOURCE)（同步源）"></a>2.1.4 SSRC(SYNCHRONIZATION SOURCE)（同步源）</h3><h3 id="2-1-5-CSRCs-CONTRIBUTING-SOURCE-（贡献源）"><a href="#2-1-5-CSRCs-CONTRIBUTING-SOURCE-（贡献源）" class="headerlink" title="2.1.5 CSRCs(CONTRIBUTING SOURCE)（贡献源）"></a>2.1.5 CSRCs(CONTRIBUTING SOURCE)（贡献源）</h3><h3 id="2-1-6-MARKER"><a href="#2-1-6-MARKER" class="headerlink" title="2.1.6 MARKER"></a>2.1.6 MARKER</h3><h3 id="2-1-7-PADDING"><a href="#2-1-7-PADDING" class="headerlink" title="2.1.7 PADDING"></a>2.1.7 PADDING</h3><h3 id="2-1-8-VERSION-NUMBER"><a href="#2-1-8-VERSION-NUMBER" class="headerlink" title="2.1.8 VERSION NUMBER"></a>2.1.8 VERSION NUMBER</h3><h2 id="2-2-Payload-Headers（负载头）"><a href="#2-2-Payload-Headers（负载头）" class="headerlink" title="2.2 Payload Headers（负载头）"></a>2.2 Payload Headers（负载头）</h2><h2 id="2-3-Payload-Data（负载数据）"><a href="#2-3-Payload-Data（负载数据）" class="headerlink" title="2.3 Payload Data（负载数据）"></a>2.3 Payload Data（负载数据）</h2><h1 id="三、Packet-Validation（包验证）"><a href="#三、Packet-Validation（包验证）" class="headerlink" title="三、Packet Validation（包验证）"></a>三、Packet Validation（包验证）</h1><h1 id="四、Translators-and-Mixers"><a href="#四、Translators-and-Mixers" class="headerlink" title="四、Translators and Mixers"></a>四、Translators and Mixers</h1>
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2021/06/13/rtp2/" data-id="ckpv1ty3c0001w8u6gpmpdc5l" data-title="rtp学习笔记（二） RTP数据传输协议" class="article-share-link">分享</a>
+      <a data-url="http://example.com/2021/06/13/rtp2/" data-id="ckpvawqsg00007gu692xa7cqw" data-title="rtp学习笔记（二） RTP数据传输协议" class="article-share-link">分享</a>
       
       
       
