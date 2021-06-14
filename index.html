@@ -225,11 +225,14 @@ else &#123;
 <h3 id="2-1-7-PADDING"><a href="#2-1-7-PADDING" class="headerlink" title="2.1.7 PADDING"></a>2.1.7 PADDING</h3><p>RTP 报头中的 padding (P) 位用于指示负载已被填充超过其自然长度。如果填充被添加到 RTP 数据包，则 P 位被设置，有效载荷的最后一个八位字节填充有填充八位字节数的计数。填充很少使用，但对于某些处理特定块大小的加密方案以及将有效载荷格式调整为固定容量信道，则需要使用填充。</p>
 <p>作为使用填充的示例，图 4.4 显示了在 RTP 中打包的 GSM 音频帧，该帧已从 45 个八位字节的自然长度填充为 48 个八位字节（GSM 帧为 33，RTP 报头为 12）。如果使用数据加密标准 (DES)加密数据包，则可能需要此填充，该标准需要 8 个八位字节（64 位）块。</p>
 <h3 id="2-1-8-VERSION-NUMBER"><a href="#2-1-8-VERSION-NUMBER" class="headerlink" title="2.1.8 VERSION NUMBER"></a>2.1.8 VERSION NUMBER</h3><p>每个 RTP 数据包包含一个 version number，由 V 字段指示。当前版本的 RTP 定义了附加版本，而以前的 RTP 版本并未广泛使用。版本号字段唯一有意义的用途是作为数据包有效性检查的一部分。</p>
-<h2 id="2-2-Header-Extensions"><a href="#2-2-Header-Extensions" class="headerlink" title="2.2 Header Extensions"></a>2.2 Header Extensions</h2><h2 id="2-3-Payload-Headers（负载头）"><a href="#2-3-Payload-Headers（负载头）" class="headerlink" title="2.3 Payload Headers（负载头）"></a>2.3 Payload Headers（负载头）</h2><h2 id="2-4-Payload-Data（负载数据）"><a href="#2-4-Payload-Data（负载数据）" class="headerlink" title="2.4 Payload Data（负载数据）"></a>2.4 Payload Data（负载数据）</h2><h1 id="三、Packet-Validation（包验证）"><a href="#三、Packet-Validation（包验证）" class="headerlink" title="三、Packet Validation（包验证）"></a>三、Packet Validation（包验证）</h1><h1 id="四、Translators-and-Mixers"><a href="#四、Translators-and-Mixers" class="headerlink" title="四、Translators and Mixers"></a>四、Translators and Mixers</h1>
+<h2 id="2-2-Header-Extensions"><a href="#2-2-Header-Extensions" class="headerlink" title="2.2 Header Extensions"></a>2.2 Header Extensions</h2><p>RTP 允许扩展报头（由设置为 1 的 X 位表示）出现在固定 RTP 报头之后，在任何有效载荷报头和有效载荷本身之前。扩展头的长度可变，但它们以 16 位类型字段开始，后跟 16 位长度字段（以八位字节计算扩展的长度，不包括初始 32 位），允许不理解其的接收者忽略相关扩展。</p>
+<p>扩展头为需要比固定 RTP 头提供的头信息更多的头信息的实验提供。它们很少使用；需要额外的、与有效载荷格式无关的头信息的扩展最好写成新的 RTP 配置文件。如果特定有效载荷格式需要额外的报头，则它们不应使用报头扩展，而应作为有效载荷报头携带在数据包的有效载荷部分中。</p>
+<p>尽管标头扩展极为罕见，但应准备好通过忽略扩展来处理包含无法识别的标头扩展的数据包的健壮实现。</p>
+<h2 id="2-3-Payload-Headers（负载头）"><a href="#2-3-Payload-Headers（负载头）" class="headerlink" title="2.3 Payload Headers（负载头）"></a>2.3 Payload Headers（负载头）</h2><h2 id="2-4-Payload-Data（负载数据）"><a href="#2-4-Payload-Data（负载数据）" class="headerlink" title="2.4 Payload Data（负载数据）"></a>2.4 Payload Data（负载数据）</h2><h1 id="三、Packet-Validation（包验证）"><a href="#三、Packet-Validation（包验证）" class="headerlink" title="三、Packet Validation（包验证）"></a>三、Packet Validation（包验证）</h1><h1 id="四、Translators-and-Mixers"><a href="#四、Translators-and-Mixers" class="headerlink" title="四、Translators and Mixers"></a>四、Translators and Mixers</h1>
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2021/06/13/rtp2/" data-id="ckpwaqbsr000530u64bq3euky" data-title="rtp学习笔记（二） RTP数据传输协议" class="article-share-link">分享</a>
+      <a data-url="http://example.com/2021/06/13/rtp2/" data-id="ckpwaw44u00051cu641yr41wk" data-title="rtp学习笔记（二） RTP数据传输协议" class="article-share-link">分享</a>
       
       
       
@@ -318,7 +321,7 @@ else &#123;
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2021/06/12/rtp1/" data-id="ckpwaqbsd000030u6bzm01fc2" data-title="rtp学习笔记（一） RTP传输协议介绍" class="article-share-link">分享</a>
+      <a data-url="http://example.com/2021/06/12/rtp1/" data-id="ckpwaw44f00001cu640kvhf2g" data-title="rtp学习笔记（一） RTP传输协议介绍" class="article-share-link">分享</a>
       
       
       
