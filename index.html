@@ -248,11 +248,11 @@ else &#123;
 <p>当您选择要包含在每个数据包中的有效负载数据量时，需要考虑两个关键问题：将要经过的网络路径的最大传输单位 (MTU)，以及等待更多数据传输而引起的延迟生产以填充更长的包。</p>
 <p>超过 MTU 的数据包将被分段或丢弃。如果过大的数据包被丢弃，这显然是不可取的；不那么明显的是由于碎片化造成的问题。如果所有碎片都到达，则碎片数据包将在接收器处重新组装。如果任何片段丢失，即使正确接收了整个数据包的某些部分，也必须丢弃整个数据包。结果是损失乘数效应，如果数据包的大小适当，并且有效载荷格式被设计为可以独立解码每个数据包（如与 有效载荷头 相关的讨论），则可以避免这种情况。</p>
 <p>延迟是另一个问题，因为在生成它将包含的最后一个八位字节数据之前，无法发送数据包。数据包开始处的数据会延迟，直到完整的数据包准备就绪。在许多应用程序中，延迟问题对应用程序提供了比 MTU 更严格的约束。</p>
-<h1 id="三、Packet-Validation（包验证）"><a href="#三、Packet-Validation（包验证）" class="headerlink" title="三、Packet Validation（包验证）"></a>三、Packet Validation（包验证）</h1><h1 id="四、Translators-and-Mixers"><a href="#四、Translators-and-Mixers" class="headerlink" title="四、Translators and Mixers"></a>四、Translators and Mixers</h1>
+<h1 id="三、Packet-Validation（包验证）"><a href="#三、Packet-Validation（包验证）" class="headerlink" title="三、Packet Validation（包验证）"></a>三、Packet Validation（包验证）</h1><h1 id="四、Translators-and-Mixers"><a href="#四、Translators-and-Mixers" class="headerlink" title="四、Translators and Mixers"></a>四、Translators and Mixers</h1><h2 id="4-1-Translators"><a href="#4-1-Translators" class="headerlink" title="4.1 Translators"></a>4.1 Translators</h2><h2 id="4-2-Mixers"><a href="#4-2-Mixers" class="headerlink" title="4.2 Mixers"></a>4.2 Mixers</h2>
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2021/06/13/rtp2/" data-id="ckpwbh9xk00053ou64nuad6mo" data-title="rtp学习笔记（二） RTP数据传输协议" class="article-share-link">分享</a>
+      <a data-url="http://example.com/2021/06/13/rtp2/" data-id="ckpwbjumh00052cu65box8te3" data-title="rtp学习笔记（二） RTP数据传输协议" class="article-share-link">分享</a>
       
       
       
@@ -341,7 +341,7 @@ else &#123;
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2021/06/12/rtp1/" data-id="ckpwbh9x200003ou6e8x7gwsl" data-title="rtp学习笔记（一） RTP传输协议介绍" class="article-share-link">分享</a>
+      <a data-url="http://example.com/2021/06/12/rtp1/" data-id="ckpwbjulu00002cu60bq01o5z" data-title="rtp学习笔记（一） RTP传输协议介绍" class="article-share-link">分享</a>
       
       
       
