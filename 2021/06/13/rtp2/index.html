@@ -14,7 +14,7 @@
 <meta property="og:description" content="（来自《RTP：Audio and video for the Internet》第四章） RTP数据传输协议包含：1.RTP会话、2.RTP数据传输包、3.包验证、4.Translators and Mixers 一、RTP Sessions（RTP会话）会话由使用 RTP 进行通信的一组参与者组成。一个参与者可能在多个 RTP 会话中处于活动状态——例如，一个会话用于交换音频数据，另一个会话用">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-06-13T09:38:38.000Z">
-<meta property="article:modified_time" content="2021-06-13T15:00:15.963Z">
+<meta property="article:modified_time" content="2021-06-14T03:31:14.336Z">
 <meta property="article:author" content="rionnag">
 <meta property="article:tag" content="rtp">
 <meta property="article:tag" content="音视频">
@@ -163,11 +163,44 @@ a=rtpmap:98 H263-1998/90000 </code></pre>
 <p>对于静态分配，时钟速率在配置文件中指定；动态分配必须指示时钟速率同负载类型和负载格式之间的映射。例如，在前面的会话描述中，a=rtpmap: 行为 VIDEO/H263-1998 有效载荷格式指定了 90,000-Hz 时钟。大多数有效载荷格式以一组有限的时钟速率运行，有效载荷格式规范定义了哪些速率是有效的。</p>
 <p>RTP 会话不需要只使用单一的有效载荷格式；会话中可以使用多种有效载荷格式，不同的格式由不同的有效载荷类型标识。格式可以在会话内随时改变，只要预先传达了有效载荷类型到有效载荷格式的映射，在改变发生之前不需要信令。一个例子可能是在 IP 语音会话中对 DTMF 音进行编码，以支持“按 0 与操作员通话”风格的自动化服务，其中一种格式用于语音，另一种格式用于音调。</p>
 <p>尽管可以在一个会话中使用多种有效载荷格式，但有效载荷类型并不打算用于多路复用不同类别的媒体。例如，如果应用程序同时发送音频和视频，则它们应该作为两个不同的 RTP 会话在不同的地址/端口上发送，而不是作为单个 RTP 会话发送并按有效载荷类型进行多路分解。这种媒体分离允许应用程序为不同的媒体请求不同的网络服务质量，这也是 RTP 控制协议正确运行所必需的。</p>
-<h3 id="2-1-2-SEQUENCE-NUMBER（序列号）"><a href="#2-1-2-SEQUENCE-NUMBER（序列号）" class="headerlink" title="2.1.2 SEQUENCE NUMBER（序列号）"></a>2.1.2 SEQUENCE NUMBER（序列号）</h3><h3 id="2-1-3-TIMESTAMP（时间戳）"><a href="#2-1-3-TIMESTAMP（时间戳）" class="headerlink" title="2.1.3 TIMESTAMP（时间戳）"></a>2.1.3 TIMESTAMP（时间戳）</h3><h3 id="2-1-4-SSRC-SYNCHRONIZATION-SOURCE-（同步源）"><a href="#2-1-4-SSRC-SYNCHRONIZATION-SOURCE-（同步源）" class="headerlink" title="2.1.4 SSRC(SYNCHRONIZATION SOURCE)（同步源）"></a>2.1.4 SSRC(SYNCHRONIZATION SOURCE)（同步源）</h3><h3 id="2-1-5-CSRCs-CONTRIBUTING-SOURCE-（贡献源）"><a href="#2-1-5-CSRCs-CONTRIBUTING-SOURCE-（贡献源）" class="headerlink" title="2.1.5 CSRCs(CONTRIBUTING SOURCE)（贡献源）"></a>2.1.5 CSRCs(CONTRIBUTING SOURCE)（贡献源）</h3><h3 id="2-1-6-MARKER"><a href="#2-1-6-MARKER" class="headerlink" title="2.1.6 MARKER"></a>2.1.6 MARKER</h3><h3 id="2-1-7-PADDING"><a href="#2-1-7-PADDING" class="headerlink" title="2.1.7 PADDING"></a>2.1.7 PADDING</h3><h3 id="2-1-8-VERSION-NUMBER"><a href="#2-1-8-VERSION-NUMBER" class="headerlink" title="2.1.8 VERSION NUMBER"></a>2.1.8 VERSION NUMBER</h3><h2 id="2-2-Payload-Headers（负载头）"><a href="#2-2-Payload-Headers（负载头）" class="headerlink" title="2.2 Payload Headers（负载头）"></a>2.2 Payload Headers（负载头）</h2><h2 id="2-3-Payload-Data（负载数据）"><a href="#2-3-Payload-Data（负载数据）" class="headerlink" title="2.3 Payload Data（负载数据）"></a>2.3 Payload Data（负载数据）</h2><h1 id="三、Packet-Validation（包验证）"><a href="#三、Packet-Validation（包验证）" class="headerlink" title="三、Packet Validation（包验证）"></a>三、Packet Validation（包验证）</h1><h1 id="四、Translators-and-Mixers"><a href="#四、Translators-and-Mixers" class="headerlink" title="四、Translators and Mixers"></a>四、Translators and Mixers</h1>
+<h3 id="2-1-2-SEQUENCE-NUMBER（序列号）"><a href="#2-1-2-SEQUENCE-NUMBER（序列号）" class="headerlink" title="2.1.2 SEQUENCE NUMBER（序列号）"></a>2.1.2 SEQUENCE NUMBER（序列号）</h3><p>RTP的 sequence number 用于识别数据包，并在数据包丢失或无序传送时向接收器提供指示。它不用于安排数据包的播放——这是时间戳的目的——尽管它确实允许接收器重建数据包的发送顺序。</p>
+<p>序列号是一个无符号的 16 位整数，它随着每个数据包的发送而增加 1，并在达到最大值时回零。 16 位空间的一个重要结果是序列号溢出发生得相对频繁：典型的 IP 语音应用程序以 20 毫秒的数据包发送音频，大约每 20 分钟溢出一次序列号。</p>
+<p>这意味着应用程序不应依赖序列号作为唯一的数据包标识符。相反，建议他们使用 32 位或更宽的扩展序列号来内部识别数据包，低 16 位是来自 RTP 数据包的序列号，高 16 位是序列号的溢出次数：</p>
+<pre><code>extended_seq_num = seq_num + (65536 * wrap_around_count) </code></pre>
+<p>由于可能的数据包丢失或重新排序，维护溢出计数 (wrap-around-count) 不是在序列号溢出为零时增加计数器的简单问题。 RTP 规范有一个维护环绕计数器的算法：</p>
+<pre><code>uint16_t    udelta = seq – max_seq 
+if (udelta &lt; max_dropout) &#123;     
+    if (seq &lt; max_seq) &#123;         
+        wrap_around_count++ 
+    &#125;     
+    max_seq = seq; 
+&#125;
+else if (udelta &lt;= 65535 – max_misorder) &#123;
+    // The sequence number made a very large jump     
+    if (seq == bad_seq) &#123;
+        // Two sequential packets received; assume the         
+        // other side has restarted without telling us         
+        ...     
+    &#125; else &#123;
+        bad_seq = seq + 1;
+    &#125; 
+&#125; 
+else &#123;
+    // Duplicate or misordered packet     
+    ... 
+&#125;</code></pre>
+<p>请注意，所有计算都是使用模算术和 16 位无符号量完成的。 seq 和 max_seq 都是来自 RTP 数据包的未扩展序列号。 RTP 规范建议 max_misorder = 100 和 max_dropout = 3000</p>
+<p>如果在接收到数据包时立即计算扩展序列号并在此后使用，则大多数应用程序可能忽略扩展序列号溢出。隐藏序列号溢出极大地简化了丢失检测和隐藏、数据包重新排序以及统计数据的维护。除非数据包速率非常高，否则 32 位序列号的溢出时间是大多数应用程序可以忽略的。例如，前面给出的 IP 语音示例将需要两年多的时间来溢出扩展序列号。</p>
+<p>如果数据包速率非常高，则在应用程序运行时可能会出现 32 位扩展序列号溢出。在为此类环境设计应用程序时，必须使用更大的扩展序列号（例如 64 位）来避免该问题，或者通过使用 32 位模运算处理序列号溢出来构建应用程序.序列号溢出期间的不正确操作是一个常见问题，尤其是当数据包在溢出期间丢失或重新排序的时候。</p>
+<p>序列号的初始值应该随机选择，而不是从零开始。此预防措施旨在使对加密 RTP 流的已知纯文本攻击更加困难。即使源不加密，使用随机初始序列号也很重要，因为流可能会通过源不知道的加密转换器，并且在转换器中添加随机偏移并非易事（因为序列号是在 RTCP 接收报告包中报告；参见 RTP 控制协议）。一个常见的实现问题是假设序列号从零开始；无论初始序列号如何，接收器都应该能够播放流（处理延迟连接也需要此功能）。</p>
+<p>序列号应该始终遵循一个连续的序列，每发送一个数据包就增加一个，并且永远不会向前或向后跳跃（当然，环绕除外）。无论媒体如何生成，此要求都应适用于有效载荷格式的更改。例如，当您将视频剪辑拼接在一起时（可能是插入广告），RTP 序列号空间必须是连续的，并且不得在每个剪辑的开头重置。这对流媒体服务器的设计有影响，因为它们不能依赖与媒体文件一起存储的序列号，并且必须即时生成序列号。</p>
+<p>序列号的主要用途是丢失检测。序列号空间中​​的间隙向接收器表明它必须采取行动来恢复或隐藏丢失的数据。这在 Error Concealment 和Error Correction 中有更详细的讨论。</p>
+<p>序列号的第二个用途是允许重建数据包发送的顺序。接收器不一定关心这一点——因为许多有效载荷格式允许以任何顺序对数据包进行解码——但是在接收到数据包时将数据包按顺序排序可能会使丢失检测更容易。播出缓冲算法的设计在 Chapter 6 媒体捕捉、播出和计时中有更详细的讨论。</p>
+<h3 id="2-1-3-TIMESTAMP（时间戳）"><a href="#2-1-3-TIMESTAMP（时间戳）" class="headerlink" title="2.1.3 TIMESTAMP（时间戳）"></a>2.1.3 TIMESTAMP（时间戳）</h3><h3 id="2-1-4-SSRC-SYNCHRONIZATION-SOURCE-（同步源）"><a href="#2-1-4-SSRC-SYNCHRONIZATION-SOURCE-（同步源）" class="headerlink" title="2.1.4 SSRC(SYNCHRONIZATION SOURCE)（同步源）"></a>2.1.4 SSRC(SYNCHRONIZATION SOURCE)（同步源）</h3><h3 id="2-1-5-CSRCs-CONTRIBUTING-SOURCE-（贡献源）"><a href="#2-1-5-CSRCs-CONTRIBUTING-SOURCE-（贡献源）" class="headerlink" title="2.1.5 CSRCs(CONTRIBUTING SOURCE)（贡献源）"></a>2.1.5 CSRCs(CONTRIBUTING SOURCE)（贡献源）</h3><h3 id="2-1-6-MARKER"><a href="#2-1-6-MARKER" class="headerlink" title="2.1.6 MARKER"></a>2.1.6 MARKER</h3><h3 id="2-1-7-PADDING"><a href="#2-1-7-PADDING" class="headerlink" title="2.1.7 PADDING"></a>2.1.7 PADDING</h3><h3 id="2-1-8-VERSION-NUMBER"><a href="#2-1-8-VERSION-NUMBER" class="headerlink" title="2.1.8 VERSION NUMBER"></a>2.1.8 VERSION NUMBER</h3><h2 id="2-2-Payload-Headers（负载头）"><a href="#2-2-Payload-Headers（负载头）" class="headerlink" title="2.2 Payload Headers（负载头）"></a>2.2 Payload Headers（负载头）</h2><h2 id="2-3-Payload-Data（负载数据）"><a href="#2-3-Payload-Data（负载数据）" class="headerlink" title="2.3 Payload Data（负载数据）"></a>2.3 Payload Data（负载数据）</h2><h1 id="三、Packet-Validation（包验证）"><a href="#三、Packet-Validation（包验证）" class="headerlink" title="三、Packet Validation（包验证）"></a>三、Packet Validation（包验证）</h1><h1 id="四、Translators-and-Mixers"><a href="#四、Translators-and-Mixers" class="headerlink" title="四、Translators and Mixers"></a>四、Translators and Mixers</h1>
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2021/06/13/rtp2/" data-id="ckpvbe4lp0005gku6c5cf4q6b" data-title="rtp学习笔记（二） RTP数据传输协议" class="article-share-link">分享</a>
+      <a data-url="http://example.com/2021/06/13/rtp2/" data-id="ckpw27xag00055su6gnmycz45" data-title="rtp学习笔记（二） RTP数据传输协议" class="article-share-link">分享</a>
       
       
       
