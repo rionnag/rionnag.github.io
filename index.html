@@ -163,7 +163,7 @@ a=rtpmap:98 H263-1998/90000 </code></pre>
 <p>序列号是一个无符号的 16 位整数，它随着每个数据包的发送而增加 1，并在达到最大值时回零。 16 位空间的一个重要结果是序列号溢出发生得相对频繁：典型的 IP 语音应用程序以 20 毫秒的数据包发送音频，大约每 20 分钟溢出一次序列号。</p>
 <p>这意味着应用程序不应依赖序列号作为唯一的数据包标识符。相反，建议他们使用 32 位或更宽的扩展序列号来内部识别数据包，低 16 位是来自 RTP 数据包的序列号，高 16 位是序列号的溢出次数：</p>
 <pre><code>extended_seq_num = seq_num + (65536 * wrap_around_count) </code></pre>
-<p>由于可能的数据包丢失或重新排序，维护溢出计数 (wrap-around-count) 不是在序列号溢出为零时增加计数器的简单问题。 RTP 规范有一个维护环绕计数器的算法：</p>
+<p>由于可能的数据包丢失或重新排序，维护溢出计数 (wrap-around-count) 不是在序列号溢出为零时增加计数器的简单问题。 RTP 规范有一个维护溢出计数的算法：</p>
 <pre><code>uint16_t    udelta = seq – max_seq 
 if (udelta &lt; max_dropout) &#123;     
     if (seq &lt; max_seq) &#123;         
@@ -192,11 +192,29 @@ else &#123;
 <p>序列号应该始终遵循一个连续的序列，每发送一个数据包就增加一个，并且永远不会向前或向后跳跃（当然，环绕除外）。无论媒体如何生成，此要求都应适用于有效载荷格式的更改。例如，当您将视频剪辑拼接在一起时（可能是插入广告），RTP 序列号空间必须是连续的，并且不得在每个剪辑的开头重置。这对流媒体服务器的设计有影响，因为它们不能依赖与媒体文件一起存储的序列号，并且必须即时生成序列号。</p>
 <p>序列号的主要用途是丢失检测。序列号空间中​​的间隙向接收器表明它必须采取行动来恢复或隐藏丢失的数据。这在 Error Concealment 和Error Correction 中有更详细的讨论。</p>
 <p>序列号的第二个用途是允许重建数据包发送的顺序。接收器不一定关心这一点——因为许多有效载荷格式允许以任何顺序对数据包进行解码——但是在接收到数据包时将数据包按顺序排序可能会使丢失检测更容易。播出缓冲算法的设计在 Chapter 6 媒体捕捉、播出和计时中有更详细的讨论。</p>
-<h3 id="2-1-3-TIMESTAMP（时间戳）"><a href="#2-1-3-TIMESTAMP（时间戳）" class="headerlink" title="2.1.3 TIMESTAMP（时间戳）"></a>2.1.3 TIMESTAMP（时间戳）</h3><h3 id="2-1-4-SSRC-SYNCHRONIZATION-SOURCE-（同步源）"><a href="#2-1-4-SSRC-SYNCHRONIZATION-SOURCE-（同步源）" class="headerlink" title="2.1.4 SSRC(SYNCHRONIZATION SOURCE)（同步源）"></a>2.1.4 SSRC(SYNCHRONIZATION SOURCE)（同步源）</h3><h3 id="2-1-5-CSRCs-CONTRIBUTING-SOURCE-（贡献源）"><a href="#2-1-5-CSRCs-CONTRIBUTING-SOURCE-（贡献源）" class="headerlink" title="2.1.5 CSRCs(CONTRIBUTING SOURCE)（贡献源）"></a>2.1.5 CSRCs(CONTRIBUTING SOURCE)（贡献源）</h3><h3 id="2-1-6-MARKER"><a href="#2-1-6-MARKER" class="headerlink" title="2.1.6 MARKER"></a>2.1.6 MARKER</h3><h3 id="2-1-7-PADDING"><a href="#2-1-7-PADDING" class="headerlink" title="2.1.7 PADDING"></a>2.1.7 PADDING</h3><h3 id="2-1-8-VERSION-NUMBER"><a href="#2-1-8-VERSION-NUMBER" class="headerlink" title="2.1.8 VERSION NUMBER"></a>2.1.8 VERSION NUMBER</h3><h2 id="2-2-Payload-Headers（负载头）"><a href="#2-2-Payload-Headers（负载头）" class="headerlink" title="2.2 Payload Headers（负载头）"></a>2.2 Payload Headers（负载头）</h2><h2 id="2-3-Payload-Data（负载数据）"><a href="#2-3-Payload-Data（负载数据）" class="headerlink" title="2.3 Payload Data（负载数据）"></a>2.3 Payload Data（负载数据）</h2><h1 id="三、Packet-Validation（包验证）"><a href="#三、Packet-Validation（包验证）" class="headerlink" title="三、Packet Validation（包验证）"></a>三、Packet Validation（包验证）</h1><h1 id="四、Translators-and-Mixers"><a href="#四、Translators-and-Mixers" class="headerlink" title="四、Translators and Mixers"></a>四、Translators and Mixers</h1>
+<h3 id="2-1-3-TIMESTAMP（时间戳）"><a href="#2-1-3-TIMESTAMP（时间戳）" class="headerlink" title="2.1.3 TIMESTAMP（时间戳）"></a>2.1.3 TIMESTAMP（时间戳）</h3><p>RTP timestamp 表示数据包中媒体数据的第一个八位字节的采样时刻，用于调度媒体数据的播放。时间戳是一个 32 位无符号整数，它以与媒体相关的速率增加，并在超过最大值时环绕到零。对于典型的视频编解码器，使用 90kHz 的时钟频率，对应大约 13 小时的环绕；对于 8kHz 音频，间隔大约为 6 天。</p>
+<p>时间戳的初始值是随机选择的，而不是从零开始。与序列号一样，此预防措施旨在使对加密 RTP 流的已知纯文本攻击更加困难。即使源不加密，随机初始时间戳的使用也很重要，因为流可能通过源不知道的加密转换器。一个常见的实现问题是假设时间戳从零开始。无论初始时间戳如何，接收器都应该能够播放流并准备好处理环绕；因为时间戳不是从零开始，所以任何时候都可能发生回绕。</p>
+<p>时间戳回绕是 RTP 操作的正常部分，应由所有应用程序处理。使用扩展时间戳，可能是 64 位值，可以使大多数应用程序不知道回绕。但是，不建议使用扩展时间戳，因为 64 位算法在当今的处理器上通常效率低下。</p>
+<p>更好的设计使用 32 位模运算执行所有时间戳计算。这种方法允许计算时间戳之间的差异，前提是比较的数据包在彼此的时间戳空间的一半之内。</p>
+<p>时间戳源自必须以线性和单调方式增加的媒体时钟（当然，环绕式除外），为每个 RTP 会话生成单个时间线。这与生成媒体流的方式无关。</p>
+<p>一个示例有助于阐明时间戳增加方式的含义：在单个 RTP 会话中将音频剪辑拼接在一起时，RTP 时间戳必须形成连续序列，并且不得在每个剪辑的开头重置。这些要求在 图 4.3 中进行了说明，这表明 RTP 接收器无法从 RTP 头中得知发生了变化。</p>
+<p>当发生快进或倒带操作时也是如此：时间戳必须形成一个连续的序列，而不是跳来跳去。这一要求在实时流协议 (RTSP) 的设计中很明显，包括“正常播放时间”的概念，表示流中的时间索引。由于必须保持 RTP 时间戳的连续性，因此在查找操作期间，RTSP 服务器必须发送 RTP 时间戳与正常播放时间之间的更新映射。</p>
+<p>RTP 时间戳的连续性对流媒体服务器的设计有影响。服务器不能依赖与媒体文件一起存储的时间戳（或序列号），但必须即时生成它们，同时考虑媒体中的查找操作和 RTP 会话中已播放的任何先前数据的持续时间。</p>
+<p>对以线性和单调方式增加的媒体时钟的要求并不一定意味着媒体数据的采样顺序就是它的发送顺序。在生成媒体帧之后——因此获得了它们的时间戳——它们可以在分组之前重新排序。结果，即使保持序列号顺序，数据包也可能不按时间戳顺序传输。接收器必须重建时间戳顺序才能播放媒体。</p>
+<p>一个例子是 MPEG 视频，它包含关键帧和从它们向前（P 帧）和向后（B 帧）预测的增量编码帧。当使用 B 帧时，它们是从后面的数据包中预测出来的，因此必须延迟并乱序发送。结果是 RTP 流将具有非单调递增的时间戳。 另一个例子是使用交错以减少突发丢失的影响。在所有情况下，接收者必须重建以播放媒体的单个时间线被保留。</p>
+<p>RTP 数据包上的时间戳在每个环绕周期内不一定是唯一的。如果两个数据包包含来自同一采样时刻的数据，则它们将具有相同的时间戳。当一个大的视频帧被分成多个 RTP 数据包进行传输（数据包将具有不同的序列号但具有相同的时间戳）时，通常会发生时间戳的重复。</p>
+<p>用于生成时间戳的媒体时钟的标称速率由使用的配置文件和/或有效载荷格式定义。对于具有静态有效载荷类型分配的有效载荷格式，当使用静态有效载荷类型时，时钟速率是隐式的（它被指定为有效载荷类型分配的一部分）。动态分配过程必须指定速率和有效载荷类型（参见本章前面标题为 Payload Type 的部分）。所选的速率必须足以以所需的精度执行唇形同步，并测量网络传输时间的变化。时钟频率不可任意选择；大多数有效载荷格式定义了一个或多个可接受的速率。</p>
+<p>音频有效负载格式通常使用采样率作为其媒体时钟，因此每次读取完整样本时时钟增加 1。有两个例外： MPEG 音频使用 90kHz 时钟以兼容非 RTP MPEG 传输； G.722 是一种 16kHz 语音编解码器，它使用 8kHz 媒体时钟与 RFC 1890 向后兼容，RFC 1890 错误地指定了 8kHz 而不是 16kHz。</p>
+<p>视频有效载荷格式通常使用 90kHz 时钟，以便与 MPEG 兼容，并且因为这样做会为当今广泛使用的典型 24Hz、25Hz、29.97Hz 和 30Hz 帧速率以及 50Hz、59.94Hz 和 60Hz 场速率产生整数时间戳增量.示例包括 PAL（相位交替线）和 NTSC（国家电视标准委员会）电视，以及 HDTV（高清晰度电视）格式。</p>
+<p>重要的是要记住，RTP 不保证媒体时钟的分辨率、准确性或稳定性——这些属性被认为是依赖于应用程序的，并且超出了 RTP 的范围——一般来说，已知的只是其标称速率.应用程序应该能够在发送方和接收方处理媒体时钟的可变性，除非它们具有相反的特定知识。</p>
+<hr>
+<p><em>在某些情况下，可以定义媒体时钟的分辨率、精度和稳定性，并使用这些知识来简化应用程序设计。这通常只有在单个实体同时控制发送方和接收方，或者两者都设计为具有严格时钟规范的配置文件时才有可能</em></p>
+<hr>
+<h3 id="2-1-4-SSRC-SYNCHRONIZATION-SOURCE-（同步源）"><a href="#2-1-4-SSRC-SYNCHRONIZATION-SOURCE-（同步源）" class="headerlink" title="2.1.4 SSRC(SYNCHRONIZATION SOURCE)（同步源）"></a>2.1.4 SSRC(SYNCHRONIZATION SOURCE)（同步源）</h3><h3 id="2-1-5-CSRCs-CONTRIBUTING-SOURCE-（贡献源）"><a href="#2-1-5-CSRCs-CONTRIBUTING-SOURCE-（贡献源）" class="headerlink" title="2.1.5 CSRCs(CONTRIBUTING SOURCE)（贡献源）"></a>2.1.5 CSRCs(CONTRIBUTING SOURCE)（贡献源）</h3><h3 id="2-1-6-MARKER"><a href="#2-1-6-MARKER" class="headerlink" title="2.1.6 MARKER"></a>2.1.6 MARKER</h3><h3 id="2-1-7-PADDING"><a href="#2-1-7-PADDING" class="headerlink" title="2.1.7 PADDING"></a>2.1.7 PADDING</h3><h3 id="2-1-8-VERSION-NUMBER"><a href="#2-1-8-VERSION-NUMBER" class="headerlink" title="2.1.8 VERSION NUMBER"></a>2.1.8 VERSION NUMBER</h3><h2 id="2-2-Payload-Headers（负载头）"><a href="#2-2-Payload-Headers（负载头）" class="headerlink" title="2.2 Payload Headers（负载头）"></a>2.2 Payload Headers（负载头）</h2><h2 id="2-3-Payload-Data（负载数据）"><a href="#2-3-Payload-Data（负载数据）" class="headerlink" title="2.3 Payload Data（负载数据）"></a>2.3 Payload Data（负载数据）</h2><h1 id="三、Packet-Validation（包验证）"><a href="#三、Packet-Validation（包验证）" class="headerlink" title="三、Packet Validation（包验证）"></a>三、Packet Validation（包验证）</h1><h1 id="四、Translators-and-Mixers"><a href="#四、Translators-and-Mixers" class="headerlink" title="四、Translators and Mixers"></a>四、Translators and Mixers</h1>
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2021/06/13/rtp2/" data-id="ckpw27xag00055su6gnmycz45" data-title="rtp学习笔记（二） RTP数据传输协议" class="article-share-link">分享</a>
+      <a data-url="http://example.com/2021/06/13/rtp2/" data-id="ckpwa66ge0001kku67fc9di53" data-title="rtp学习笔记（二） RTP数据传输协议" class="article-share-link">分享</a>
       
       
       
@@ -285,7 +303,7 @@ else &#123;
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2021/06/12/rtp1/" data-id="ckpw27xa300005su6a64wb3ox" data-title="rtp学习笔记（一） RTP传输协议介绍" class="article-share-link">分享</a>
+      <a data-url="http://example.com/2021/06/12/rtp1/" data-id="ckpwa66g90000kku63mm33t12" data-title="rtp学习笔记（一） RTP传输协议介绍" class="article-share-link">分享</a>
       
       
       
