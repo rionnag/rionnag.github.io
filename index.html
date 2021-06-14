@@ -228,11 +228,31 @@ else &#123;
 <h2 id="2-2-Header-Extensions"><a href="#2-2-Header-Extensions" class="headerlink" title="2.2 Header Extensions"></a>2.2 Header Extensions</h2><p>RTP 允许扩展报头（由设置为 1 的 X 位表示）出现在固定 RTP 报头之后，在任何有效载荷报头和有效载荷本身之前。扩展头的长度可变，但它们以 16 位类型字段开始，后跟 16 位长度字段（以八位字节计算扩展的长度，不包括初始 32 位），允许不理解其的接收者忽略相关扩展。</p>
 <p>扩展头为需要比固定 RTP 头提供的头信息更多的头信息的实验提供。它们很少使用；需要额外的、与有效载荷格式无关的头信息的扩展最好写成新的 RTP 配置文件。如果特定有效载荷格式需要额外的报头，则它们不应使用报头扩展，而应作为有效载荷报头携带在数据包的有效载荷部分中。</p>
 <p>尽管标头扩展极为罕见，但应准备好通过忽略扩展来处理包含无法识别的标头扩展的数据包的健壮实现。</p>
-<h2 id="2-3-Payload-Headers（负载头）"><a href="#2-3-Payload-Headers（负载头）" class="headerlink" title="2.3 Payload Headers（负载头）"></a>2.3 Payload Headers（负载头）</h2><h2 id="2-4-Payload-Data（负载数据）"><a href="#2-4-Payload-Data（负载数据）" class="headerlink" title="2.4 Payload Data（负载数据）"></a>2.4 Payload Data（负载数据）</h2><h1 id="三、Packet-Validation（包验证）"><a href="#三、Packet-Validation（包验证）" class="headerlink" title="三、Packet Validation（包验证）"></a>三、Packet Validation（包验证）</h1><h1 id="四、Translators-and-Mixers"><a href="#四、Translators-and-Mixers" class="headerlink" title="四、Translators and Mixers"></a>四、Translators and Mixers</h1>
+<h2 id="2-3-Payload-Headers（负载头）"><a href="#2-3-Payload-Headers（负载头）" class="headerlink" title="2.3 Payload Headers（负载头）"></a>2.3 Payload Headers（负载头）</h2><p>强制 RTP 标头提供所有有效载荷格式通用的信息。在许多情况下，有效载荷格式需要更多信息才能实现最佳操作；此信息形成一个附加的标头，该标头被定义为有效载荷格式规范的一部分。有效载荷头包含在固定头和任何 CSRC 列表和头扩展之后的 RTP 数据包中。通常，有效载荷标头的定义构成了有效载荷格式规范的大部分。</p>
+<p>负载标头中包含的信息可以是静态的（对于使用特定负载格式的每个会话都相同），也可以是动态的。有效载荷格式规范将指示有效载荷标头的哪些部分是静态的，哪些是动态的，并且必须在每个会话的基础上进行配置。那些动态的部分通常通过 SDP 配置，其中 <em>a=fmtp:</em> 属性用于定义“格式参数”，尽管有时会使用其他方式。可以指定的参数分为三类：</p>
+<p>1.那些影响有效载荷标头格式的信号，表明标头字段的存在或不存在、它们的大小和它们的格式。例如，一些有效载荷格式有多种操作模式，可能需要不同的报头字段才能使用。</p>
+<p>2.那些不影响payload头格式但定义了各种头域的使用。例如，一些有效载荷格式定义了交错的使用，并要求报头字段指示交错序列中的位置。 </p>
+<p>3.那些影响有效载荷格式而不是有效载荷头的那些。例如，参数可以指定音频编解码器的帧大小或视频帧速率。</p>
+<p>在会话期间不改变的有效载荷格式的特征通常为带库外信号的发送，而不是包含在有效载荷标头中。这减少了会话期间的开销，但代价是额外的信令复杂性。格式参数的语法和使用通常被指定为有效载荷格式规范的一部分。</p>
+<p>指定有效载荷标头的主要原因是为那些不是设计用于有损数据包网络的格式提供错误恢复能力。第一个例子是 H.261 视频的有效载荷格式，如 RFC 2032 和 RFC 2736 中所讨论的最近的例子是 MP3 和 AMR（自适应多速率）音频的更容错的有效载荷格式. 在 Chapter 8, Error Concealment 和 9, Error Correction 中进一步讨论了错误恢复问题。</p>
+<hr>
+<p><em>H.261 视频的 RTP 有效载荷格式为错误恢复设计提供了一个有趣的教训。 H.261 编解码器允许视频块组最长为 3 KB。有效载荷格式的原始版本规定，每组块应直接插入到 RTP 数据包中，如果太大，则应在数据包之间任意拆分。然而，这种方法留下了数据包到达接收器并且必须丢弃的情况，因为前一个数据包丢失了，并且部分块组不能独立解码。这是我们想要避免的损失乘数效应。</em></p>
+<p><em>实际上，块组并不是H.261视频中的最小单位。有一些更小的单元叫做 macro-blocks，但是如果不从块组的开头解析它们是无法识别的。然而，在每个数据包的开头包含附加信息可以恢复通常通过从块组的开头解析而找到的信息。此技术用于定义有效载荷格式，如果 H.261 流超过网络 MTU，则该格式将在宏块边界上拆分 H.261 流。</em></p>
+<p><em>对于 H.261 而言，这是一种不太明显的打包方式，但它确实意味着智能解码器可以从丢失的 RTP 数据包流中重建有效的 H.261 视频，而不必丢弃任何到达的数据。它显示了有效载荷格式的容错设计的优点。</em></p>
+<hr>
+<h2 id="2-4-Payload-Data（负载数据）"><a href="#2-4-Payload-Data（负载数据）" class="headerlink" title="2.4 Payload Data（负载数据）"></a>2.4 Payload Data（负载数据）</h2><p>一帧或多帧媒体有效载荷数据，直接跟在任何有效载荷报头之后，构成 RTP 数据包的最后部分（除了填充，如果需要）。有效载荷数据的大小和格式取决于在会话设置期间选择的有效载荷格式和格式参数。</p>
+<p>许多有效载荷格式允许在每个数据包中包含多个数据帧。接收器可以通过两种方式确定存在的帧数：</p>
+<p>1.在许多情况下，帧的大小是固定的，可以通过检查数据包的大小来确定存在的数量。</p>
+<p>2.其他有效载荷格式在每个封装的帧中包括一个标识符，指示帧的大小。应用程序需要解析封装的帧以确定帧数及其起始点。当框架可以是可变大小时，通常就是这种情况。</p>
+<p>通常没有指定可能包含的帧数限制。接收器应处理接收各种大小的数据包：音频/视频配置文件中的指南建议音频的长度为 200 毫秒，是帧大小的倍数，视频编解码器应同时处理分段帧和完整帧。</p>
+<p>当您选择要包含在每个数据包中的有效负载数据量时，需要考虑两个关键问题：将要经过的网络路径的最大传输单位 (MTU)，以及等待更多数据传输而引起的延迟生产以填充更长的包。</p>
+<p>超过 MTU 的数据包将被分段或丢弃。如果过大的数据包被丢弃，这显然是不可取的；不那么明显的是由于碎片化造成的问题。如果所有碎片都到达，则碎片数据包将在接收器处重新组装。如果任何片段丢失，即使正确接收了整个数据包的某些部分，也必须丢弃整个数据包。结果是损失乘数效应，如果数据包的大小适当，并且有效载荷格式被设计为可以独立解码每个数据包（如与 有效载荷头 相关的讨论），则可以避免这种情况。</p>
+<p>延迟是另一个问题，因为在生成它将包含的最后一个八位字节数据之前，无法发送数据包。数据包开始处的数据会延迟，直到完整的数据包准备就绪。在许多应用程序中，延迟问题对应用程序提供了比 MTU 更严格的约束。</p>
+<h1 id="三、Packet-Validation（包验证）"><a href="#三、Packet-Validation（包验证）" class="headerlink" title="三、Packet Validation（包验证）"></a>三、Packet Validation（包验证）</h1><h1 id="四、Translators-and-Mixers"><a href="#四、Translators-and-Mixers" class="headerlink" title="四、Translators and Mixers"></a>四、Translators and Mixers</h1>
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2021/06/13/rtp2/" data-id="ckpwaw44u00051cu641yr41wk" data-title="rtp学习笔记（二） RTP数据传输协议" class="article-share-link">分享</a>
+      <a data-url="http://example.com/2021/06/13/rtp2/" data-id="ckpwbg14m000568u6c8iyfkmo" data-title="rtp学习笔记（二） RTP数据传输协议" class="article-share-link">分享</a>
       
       
       
@@ -321,7 +341,7 @@ else &#123;
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2021/06/12/rtp1/" data-id="ckpwaw44f00001cu640kvhf2g" data-title="rtp学习笔记（一） RTP传输协议介绍" class="article-share-link">分享</a>
+      <a data-url="http://example.com/2021/06/12/rtp1/" data-id="ckpwbg141000068u6afb02z65" data-title="rtp学习笔记（一） RTP传输协议介绍" class="article-share-link">分享</a>
       
       
       
