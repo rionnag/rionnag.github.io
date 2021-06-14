@@ -14,7 +14,7 @@
 <meta property="og:description" content="（来自《RTP：Audio and video for the Internet》第四章） RTP数据传输协议包含：1.RTP会话、2.RTP数据传输包、3.包验证、4.Translators and Mixers 一、RTP Sessions（RTP会话）会话由使用 RTP 进行通信的一组参与者组成。一个参与者可能在多个 RTP 会话中处于活动状态——例如，一个会话用于交换音频数据，另一个会话用">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-06-13T09:38:38.000Z">
-<meta property="article:modified_time" content="2021-06-14T07:25:58.253Z">
+<meta property="article:modified_time" content="2021-06-14T07:29:32.438Z">
 <meta property="article:author" content="rionnag">
 <meta property="article:tag" content="rtp">
 <meta property="article:tag" content="音视频">
@@ -219,18 +219,21 @@ else &#123;
 <p>如果一个参与者检测到它正在使用的 SSRC 与另一个参与者选择的 SSRC 之间发生冲突，它必须为原始 SSRC 发送一个 RTCP BYE（参见标题为 RTCP BYE：Membership Control 的部分，在 Chapter 5，RTP 控制协议）并为自身选择另一个 SSRC。这种冲突检测机制确保 SSRC 对于会话中的每个参与者都是唯一的。</p>
 <p>重要的是使用高质量的随机源来生成 SSRC，并实现碰撞检测。特别是，随机数生成器的种子不应基于会话加入的时间或会话的传输地址，因为如果多个参与者同时加入，可能会导致冲突。</p>
 <p>具有相同 SSRC 的所有数据包构成单个时序和序列号空间的一部分，因此接收器必须按 SSRC 将数据包分组以进行回放。如果参与者在一个 RTP 会话中生成多个流——例如，来自不同的摄像机——每个流都必须被标识为不同的 SSRC，以便接收者可以区分哪些数据包属于每个流。</p>
-<h3 id="2-1-5-CSRCs-CONTRIBUTING-SOURCE-（贡献源）"><a href="#2-1-5-CSRCs-CONTRIBUTING-SOURCE-（贡献源）" class="headerlink" title="2.1.5 CSRCs(CONTRIBUTING SOURCE)（贡献源）"></a>2.1.5 CSRCs(CONTRIBUTING SOURCE)（贡献源）</h3><h3 id="2-1-6-MARKER"><a href="#2-1-6-MARKER" class="headerlink" title="2.1.6 MARKER"></a>2.1.6 MARKER</h3><p>RTP 报头中的 marker (M) 位用于标记媒体流中感兴趣的事件；它的确切含义由使用的 RTP 配置文件和媒体类型定义。</p>
+<h3 id="2-1-5-CSRCs-CONTRIBUTING-SOURCE-（贡献源）"><a href="#2-1-5-CSRCs-CONTRIBUTING-SOURCE-（贡献源）" class="headerlink" title="2.1.5 CSRCs(CONTRIBUTING SOURCE)（贡献源）"></a>2.1.5 CSRCs(CONTRIBUTING SOURCE)（贡献源）</h3><p>在正常情况下，RTP 数据由单个源生成，但是当多个 RTP 流通过混合器或转换器时，多个数据源可能对一个 RTP 数据包做出了贡献。 contributing sources (CSRC) 的列表标识了对 RTP 数据包做出贡献但不负责其计时和同步的参与者。每个贡献源标识符是一个 32 位整数，对应于为此数据包做出贡献的参与者的 SSRC。 CSRC 列表的长度由 RTP 头中的 CC 字段指示。</p>
+<p>包含 CSRC 列表的数据包是由 RTP 混合器的操作产生的，如本章后面标题为 mixers 的部分所述。当接收到包含CSRC列表的数据包时，SSRC按照通常的方式将数据包分组进行播出，并将每个CSRC添加到已知参与者列表中。由CSRC识别的每个参与者都会有相应的 RTP 控制协议数据包流，从而更全面地识别参与者。</p>
+<h3 id="2-1-6-MARKER"><a href="#2-1-6-MARKER" class="headerlink" title="2.1.6 MARKER"></a>2.1.6 MARKER</h3><p>RTP 报头中的 marker (M) 位用于标记媒体流中感兴趣的事件；它的确切含义由使用的 RTP 配置文件和媒体类型定义。</p>
 <p>对于在 RTP 配置文件下运行的音频和视频会议的最小控制的音频流，标记位设置为 1 以指示在一段时间的静音后发送的第一个数据包，否则设置为零。设置为 1 的标记位用作应用程序的提示，这可能是调整其播放点的好时机，因为静默期长度的微小变化通常不会被听众注意到（而播放中的变化正在播放音频时点是可听的）。</p>
 <p>对于在 RTP 配置文件下运行的具有最小控制的音频和视频会议的视频流，标记位设置为 1 以指示视频帧的最后一个数据包，否则设置为 0。如果设置为 1，标记将用作应用程序可以开始解码帧的提示，而不是等待下一个数据包（将具有不同的时间戳）来检测应显示该帧。</p>
 <p>在所有情况下，标记位仅向应用程序提供提示，即使设置了标记的数据包丢失，应用程序也应设计为操作。对于音频流，由于序列号和时间戳之间的关系发生变化，通常可以凭直觉判断静默期的结束。视频帧的开始可以通过时间戳的变化来检测。如果包含标记位的数据包丢失，应用程序可以使用这些观察来降低性能。</p>
 <p>RTP 配置文件可以指定存在额外的标记位，代价是较小的有效载荷类型字段。例如，配置文件可以要求两个标记位和一个六位有效载荷类型。当前没有配置文件使用此功能。</p>
 <h3 id="2-1-7-PADDING"><a href="#2-1-7-PADDING" class="headerlink" title="2.1.7 PADDING"></a>2.1.7 PADDING</h3><p>RTP 报头中的 padding (P) 位用于指示负载已被填充超过其自然长度。如果填充被添加到 RTP 数据包，则 P 位被设置，有效载荷的最后一个八位字节填充有填充八位字节数的计数。填充很少使用，但对于某些处理特定块大小的加密方案以及将有效载荷格式调整为固定容量信道，则需要使用填充。</p>
 <p>作为使用填充的示例，图 4.4 显示了在 RTP 中打包的 GSM 音频帧，该帧已从 45 个八位字节的自然长度填充为 48 个八位字节（GSM 帧为 33，RTP 报头为 12）。如果使用数据加密标准 (DES)加密数据包，则可能需要此填充，该标准需要 8 个八位字节（64 位）块。</p>
-<h3 id="2-1-8-VERSION-NUMBER"><a href="#2-1-8-VERSION-NUMBER" class="headerlink" title="2.1.8 VERSION NUMBER"></a>2.1.8 VERSION NUMBER</h3><h2 id="2-2-Header-Extensions"><a href="#2-2-Header-Extensions" class="headerlink" title="2.2 Header Extensions"></a>2.2 Header Extensions</h2><h2 id="2-3-Payload-Headers（负载头）"><a href="#2-3-Payload-Headers（负载头）" class="headerlink" title="2.3 Payload Headers（负载头）"></a>2.3 Payload Headers（负载头）</h2><h2 id="2-4-Payload-Data（负载数据）"><a href="#2-4-Payload-Data（负载数据）" class="headerlink" title="2.4 Payload Data（负载数据）"></a>2.4 Payload Data（负载数据）</h2><h1 id="三、Packet-Validation（包验证）"><a href="#三、Packet-Validation（包验证）" class="headerlink" title="三、Packet Validation（包验证）"></a>三、Packet Validation（包验证）</h1><h1 id="四、Translators-and-Mixers"><a href="#四、Translators-and-Mixers" class="headerlink" title="四、Translators and Mixers"></a>四、Translators and Mixers</h1>
+<h3 id="2-1-8-VERSION-NUMBER"><a href="#2-1-8-VERSION-NUMBER" class="headerlink" title="2.1.8 VERSION NUMBER"></a>2.1.8 VERSION NUMBER</h3><p>每个 RTP 数据包包含一个 version number，由 V 字段指示。当前版本的 RTP 定义了附加版本，而以前的 RTP 版本并未广泛使用。版本号字段唯一有意义的用途是作为数据包有效性检查的一部分。</p>
+<h2 id="2-2-Header-Extensions"><a href="#2-2-Header-Extensions" class="headerlink" title="2.2 Header Extensions"></a>2.2 Header Extensions</h2><h2 id="2-3-Payload-Headers（负载头）"><a href="#2-3-Payload-Headers（负载头）" class="headerlink" title="2.3 Payload Headers（负载头）"></a>2.3 Payload Headers（负载头）</h2><h2 id="2-4-Payload-Data（负载数据）"><a href="#2-4-Payload-Data（负载数据）" class="headerlink" title="2.4 Payload Data（负载数据）"></a>2.4 Payload Data（负载数据）</h2><h1 id="三、Packet-Validation（包验证）"><a href="#三、Packet-Validation（包验证）" class="headerlink" title="三、Packet Validation（包验证）"></a>三、Packet Validation（包验证）</h1><h1 id="四、Translators-and-Mixers"><a href="#四、Translators-and-Mixers" class="headerlink" title="四、Translators and Mixers"></a>四、Translators and Mixers</h1>
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2021/06/13/rtp2/" data-id="ckpwam1rw00059ku6f3fieg48" data-title="rtp学习笔记（二） RTP数据传输协议" class="article-share-link">分享</a>
+      <a data-url="http://example.com/2021/06/13/rtp2/" data-id="ckpwaqbsr000530u64bq3euky" data-title="rtp学习笔记（二） RTP数据传输协议" class="article-share-link">分享</a>
       
       
       
